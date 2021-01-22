@@ -1,5 +1,18 @@
 # Multi-signer
 
-The goal of the Multi-signer project is to provide a set of tools to help set up, and to the extent possible automate, the management of a DNSSEC multi-signer solution. As such, it covers both the case of having multiple DNS providers for a DNSSEC signed zone (as described here https://www.rfc-editor.org/rfc/rfc8901.txt) as well as moving a DNSSEC signed domain from one DNS provider to another, without going unsigned.
+The Multi-signer project is an open project with the goal of providing practical tools and guidelines for the implementation, automation, management and monitoring of a multi-signer model. 
 
-The biggest challange in these scenarios is coordination and exchange of DNSSEC key data needed to sign the zone, as well as the submmission of DS record(s) to the parent zone. The Multisigner projekt will provide software capable of bridging the gap between multiple DNS providers by allowing them to coordinate and exchange key data in a secure manner (as described here https://wisser.se/draft-wisser-dnssec-automation/draft-wisser-dnssec-automation.html) and will be compliant with the RFCs for DCS/CDNSKY (https://tools.ietf.org/html/rfc8078) and CSYNC (https://tools.ietf.org/html/rfc7477).
+Multi-signer Project Goals:
+
+- Create and demonstrate tools that automate addition and deletion of signers to a multi-signer model.
+- Create monitoring tools to monitor the validity of the zones.
+- Create a multi-signer Proof of Concept with multiple organizations.
+- Document the use of such tools.
+
+
+Documents of interest:
+- DNSSEC automation: https://wisser.se/draft-wisser-dnssec-automation/draft-wisser-dnssec-automation.html. 
+- Multi-Signer DNSSEC Models: https://tools.ietf.org/html/rfc8901.  
+- Managing DS Records from the Parent via CDS/CDNSKEY: https://tools.ietf.org/html/rfc8078.  
+- Child-to-Parent Synchronization in DNS: https://tools.ietf.org/html/rfc7477.  
+
