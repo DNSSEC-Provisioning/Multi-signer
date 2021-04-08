@@ -21,5 +21,5 @@ Event | Date | Comment
 ----- | ---- | ------
 ICANN 68 | 
 ICANN 69 | 
-IETF 110 | 6-12 March 2021 | Please see details of DNSOP working group https://datatracker.ietf.org/meeting/materials/
+IETF 110 | 6-12 March 2021 | Please see details of DNSOP working group https://datatracker.ietf.org/meeting/110/materials/
 ICANN 70 | 20-25 March 2021 |
