@@ -11,7 +11,7 @@ Please let us know if you miss any particulare brand of name server, capabilitie
 
 ## Command line
 
-**Athentication**: determined by provider (usually ssh)
+**Authentication**: determined by provider (usually ssh)
 
 Capability | Bind | Knot | PowerDNS
 ---------- | ---- | ---- | --------
@@ -25,7 +25,7 @@ Add CSYNC record| | | Yes<sup>2</sup>
 
 ## Dynamic DNS update
 
-**Athentication**: TSIG
+**Authentication**: TSIG
 
 Capability | Bind | Knot | PowerDNS
 ---------- | ---- | ---- | --------
@@ -35,7 +35,7 @@ Add CSYNC record|No|No|Yes
 
 ## Rest API
 
-**Athentication**: determined by provider (most probably basic auth or jwt)
+**Authentication**: determined by provider (most probably basic auth or jwt)
 
 Capability | Bind | Knot | PowerDNS
 ---------- | ---- | ---- | --------
