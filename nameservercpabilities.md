@@ -23,9 +23,9 @@ Add CSYNC record| | | Yes<sup>2</sup>
 ## Dynamic DNS update
 Capability | Bind | Knot | PowerDNS
 ---------- | ---- | ---- | --------
-Add DNSKEY records (without access to private key)|No|No|No
-Add CDS/CDNSKEY record for keys not in the DNSKEY set|No|No|No
-Add CSYNC record|No|No|No
+Add DNSKEY records (without access to private key)|No|No|Yes
+Add CDS/CDNSKEY record for keys not in the DNSKEY set|No|No|Yes
+Add CSYNC record|No|No|Yes
 
 ## Rest API
 Capability | Bind | Knot | PowerDNS
