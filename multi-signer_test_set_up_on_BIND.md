@@ -3,7 +3,7 @@
 * Ubuntu 20.04
 * BIND 9.16.1-Ubuntu (Stable Release) <id:d497c32>
 
-## Notes
+#### Notes
 * Third level domain (multisigner.examples.nu) used for easy management of DS records
 * Provisioned om micro EC2 in AWS
 * This version uses two nameservers, both running BIND
@@ -98,9 +98,11 @@ multisigner.examples.nu. 120	IN	CDS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5
 multisigner.examples.nu. 120	IN	CDNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
 ```
 
+
 ## Repeat process for second master server
 
-## Cross import keys
+
+#### Cross import keys
 
 #### Notes
 * Both master servers need to have identical CDS and CDNSKEY records
@@ -142,6 +144,7 @@ Note: Introducing the foreign DNSKEY records on one server at a time works fine,
 #### Check both servers for DNSKEY, CDS and CDNSKEY records
 ```bash
 dig @ns1.multisigner.examples.nu multisigner.examples.nu axfr | egrep 'IN\s+(CDS|[C]?DNSKEY)'
+```
 ```
 multisigner.examples.nu. 120	IN	CDS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF86 09FBE346
 multisigner.examples.nu. 120	IN	CDS	40598 13 2 B337F82CB34D453F8D9309F57367B07F0E8FA58EF947B2924A50E5AB B21285CF
