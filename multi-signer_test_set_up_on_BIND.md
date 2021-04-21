@@ -106,7 +106,8 @@ multisigner.examples.nu. 120	IN	CDNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvX
 
 #### Notes
 * Both master servers need to have identical CDS and CDNSKEY records
-* While only the foreign ZSK needs to be published in the DNSKEY record set, BIND needs the foreign KSK as well, in order to publish a matching CDS and CDNSKEY record set
+* While only the foreign ZSK needs to be published in the DNSKEY record set, BIND needs the foreign KSK as well, in order to add it to the published CDS and CDNSKEY record set.
+* Chain of trust will be intact, even if you don't att the foreign KSK to the DNSKEY set, but zone checking tools may give a warning or error.
 
 #### Fetch DNSKEYs from second master
 
@@ -118,12 +119,17 @@ dig @ns2.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'DNSKEY\
 
 #### Import ZSK and (prepare to) publish in DNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/ext_zsk.txt -P -1h multisigner.examples.nu
+sudo dnssec-importkey -f /var/cache/bind/keys/ext_zsk.txt -P -1h multisigner.examples.nu
 ```
 
 #### Import KSK and (prepare to) publish in CDS and CDNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/ext_ksk.txt -P sync -1h multisigner.examples.nu
+sudo dnssec-importkey -f /var/cache/bind/keys/ext_ksk.txt -P sync -1h multisigner.examples.nu
+```
+
+#### (Optional) Add the foreign KSK to the DNSKEY set
+```bash
+sudo dnssec-settime -P -1h /var/cache/bind/keys/Kmultisigner.examples.nu.+013+40598.private
 ```
 
 #### Load keys into BIND
@@ -142,6 +148,10 @@ sudo rndc loadkeys multisigner.examples.nu
 Note: Introducing the foreign DNSKEY records on one server at a time works fine, but fetching the right DNSKEYs to import requires more effort.
 
 #### Check both servers for DNSKEY, CDS and CDNSKEY records
+
+## Note
+The imported foreign KSK will appear only if you have opted to publish it (like below).
+
 ```bash
 dig @ns1.multisigner.examples.nu multisigner.examples.nu axfr | egrep 'IN\s+(CDS|[C]?DNSKEY)'
 ```
@@ -153,6 +163,7 @@ multisigner.examples.nu. 120	IN	CDNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082
 multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 PncpJ/Xoyo8D7CNJl/K+l2HLROiWwdItFbdMu+D+wPoTMlFz5kh4h8IF TLcJp6MyixKvByX884IZ8eJlFI2ptg==
 multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ca4SqKRUR0GWRy/C8lChaFWtYB+zO3nX+byozlS1fxDsqVHRSYImDzR6 ZkgOihJMWRQ3pSrYeubtIuOstSw4hw==
 multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
+multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082zRur71xY7oHz5o7HMCZ9tWg5n bjo8WN0YRTAqRlsBr0ZS1pxjn3XIOA==
 ```
 
 ```bash
@@ -166,6 +177,7 @@ multisigner.examples.nu. 120	IN	CDNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082
 multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 PncpJ/Xoyo8D7CNJl/K+l2HLROiWwdItFbdMu+D+wPoTMlFz5kh4h8IF TLcJp6MyixKvByX884IZ8eJlFI2ptg==
 multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ca4SqKRUR0GWRy/C8lChaFWtYB+zO3nX+byozlS1fxDsqVHRSYImDzR6 ZkgOihJMWRQ3pSrYeubtIuOstSw4hw==
 multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082zRur71xY7oHz5o7HMCZ9tWg5n bjo8WN0YRTAqRlsBr0ZS1pxjn3XIOA==
+multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
 ```
 
 
