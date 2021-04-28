@@ -180,5 +180,39 @@ multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082z
 multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
 ```
 
+#### Check that the parent nameservers have picked up and published the correct DS records
+
+```bash
+dig @ns1.examples.nu multisigner.examples.nu DS
+```
+```
+multisigner.examples.nu. 120	IN	DS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF86 09FBE346
+multisigner.examples.nu. 120	IN	DS	40598 13 2 B337F82CB34D453F8D9309F57367B07F0E8FA58EF947B2924A50E5AB B21285CF
+```
+
+```bash
+dig @ns2.examples.nu multisigner.examples.nu DS
+```
+```
+multisigner.examples.nu. 120	IN	DS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF86 09FBE346
+multisigner.examples.nu. 120	IN	DS	40598 13 2 B337F82CB34D453F8D9309F57367B07F0E8FA58EF947B2924A50E5AB B21285CF
+```
+
+#### Remove the CDS/CDNSKEY records
+
+Note: Wait 2 x maximum TTL of DS at parent and DNSKEY at all children before proceding with this step.
+
+```bash
+dnssec-settime -D sync -1h Kmultisigner.examples.nu.+013+05412.private
+```
+```bash
+dnssec-settime -D sync -1h Kmultisigner.examples.nu.+013+40598.private
+```
+```bash
+sudo rndc reload
+```
+
+## Repeat process for second master server
+
 
 
