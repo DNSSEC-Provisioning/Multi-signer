@@ -18,6 +18,9 @@ Capability | Bind | Knot | PowerDNS
 Add DNSKEY records (without access to private key)| | | Yes<sup>1</sup>
 Add CDS/CDNSKEY record for keys not in the DNSKEY set| | | Yes<sup>1</sup>
 Add CSYNC record| | | Yes<sup>2</sup>
+Remove (previously added) DNSKEY record(s)|||
+Remove CDS/CDNSKEY records|||
+Remove CSYNC record|||
 
 <sup>1</sup> `pdnsutil add-record example.com. . DNSKEY "257 3 13 aCo..."` (or `CDNSKEY`; TTL not needed if RRset already present)
 
@@ -32,6 +35,9 @@ Capability | Bind | Knot | PowerDNS
 Add DNSKEY records (without access to private key)|No|No|Yes
 Add CDS/CDNSKEY record for keys not in the DNSKEY set|No|No|Yes
 Add CSYNC record|No|No|Yes
+Remove (previously added) DNSKEY record(s)|||
+Remove CDS/CDNSKEY records|||
+Remove CSYNC record|||
 
 ## Rest API
 
@@ -42,3 +48,6 @@ Capability | Bind | Knot | PowerDNS
 Add DNSKEY records (without access to private key)|No|No|Yes
 Add CDS/CDNSKEY record for keys not in the DNSKEY set|No|No|Yes
 Add CSYNC record|No|No|Yes (with latest build)
+Remove (previously added) DNSKEY record(s)|||
+Remove CDS/CDNSKEY records|||
+Remove CSYNC record|||
