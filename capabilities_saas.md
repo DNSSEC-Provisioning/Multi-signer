@@ -1,4 +1,4 @@
-# Capabilities of DNS SaaS providers
+# Capabilities of DNS Service providers
 
 This document tries to list all capabilities needed for running a DNSSEC Multi-Signer setup.
 Capabilities are devided in groups by mode of access.
