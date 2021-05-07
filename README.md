@@ -12,8 +12,9 @@ The Multi-signer project is an open project with the goal of providing practical
 ## Please meet us at these events
 https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/events.md
 
-## Mapping of multi-signer capabilities to name server software
+## Mapping of multi-signer capabilities
 https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/nameservercpabilities.md
+https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/capabilities_saas.md
 
 ## Documents of interest
 - DNSSEC automation: https://github.com/DNSSEC-Provisioning/draft-wisser-dnssec-automation. 
