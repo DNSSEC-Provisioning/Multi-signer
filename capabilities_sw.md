@@ -29,3 +29,5 @@ Remove CSYNC record | | |
 <sup>2</sup> Untested, but should work with latest build. Remove this note when tested.
 
 Good news from ISC. It seems they consider implementation: https://gitlab.isc.org/isc-projects/bind9/-/issues/2682
+
+Things are moving for Knot DNS too https://gitlab.nic.cz/knot/knot-dns/-/merge_requests/1289/commits
