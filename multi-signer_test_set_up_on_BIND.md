@@ -7,6 +7,8 @@
 * Third level domain (multisigner.examples.nu) used for easy management of DS records
 * Provisioned om micro EC2 in AWS
 * This version uses two nameservers, both running BIND
+* Alterativly, set up a master server using Knot with [this guide](multi-signer_test_set_up_on_KNOT.md)
+* IMPORTANT! Setup is experimental.
 
 
 ## BIND install and set up on Ubuntu
@@ -109,6 +111,8 @@ multisigner.examples.nu. 120	IN	CDNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvX
 
 ### Repeat process for second master server
 
+Alterativly, set up a master server using Knot with [this guide](multi-signer_test_set_up_on_KNOT.md)
+
 #### Notes
 Zone
 ```
@@ -138,25 +142,45 @@ ls -l /var/cache/bind/keys/K*
 
 #### Notes
 * Both master servers need to have identical CDS and CDNSKEY records
-* While only the foreign ZSK needs to be published in the DNSKEY record set, BIND needs the foreign KSK as well, in order to add it to the published CDS and CDNSKEY record set.
+* While only the foreign ZSK needs to be published in the DNSKEY record set, importing the foreign KSK as well is reccomended. 
+* In this instance, BIND actually requires the foreign KSK in order to add it to the published CDS and CDNSKEY record set. 
 * Chain of trust will be intact, even if you don't att the foreign KSK to the DNSKEY set, but zone checking tools may give a warning or error.
 
-#### Fetch DNSKEYs from second master
+#### Get DNSKEYs from other master
+
+Obtain the relevant public keys from the other master(s) in the multi signer group.
 
 ```bash
-cd /var/cache/bind/keys
-dig @ns2.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'DNSKEY\s+257' > ext_ksk.txt
-dig @ns2.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'DNSKEY\s+256' > ext_zsk.txt
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY +multi
+```
+```
+multisigner.examples.nu. 120 IN	DNSKEY 256 3 13 (
+				PncpJ/Xoyo8D7CNJl/K+l2HLROiWwdItFbdMu+D+wPoT
+				MlFz5kh4h8IFTLcJp6MyixKvByX884IZ8eJlFI2ptg==
+				) ; ZSK; alg = ECDSAP256SHA256 ; key id = 19251
+multisigner.examples.nu. 120 IN	DNSKEY 257 3 13 (
+				jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082zRur71xY7oHz5
+				o7HMCZ9tWg5nbjo8WN0YRTAqRlsBr0ZS1pxjn3XIOA==
+				) ; KSK; alg = ECDSAP256SHA256 ; key id = 40598
+```
+
+If there are multiple sets of keys in the key set (if joining a multi signer group with 2+ members, or due to a key rollover), use a part of the key as a unique identifier in order to separate the keys.
+
+
+```bash
+cd /var/lib/knot/
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep '8WN0YRTAqRlsBr0ZS1pxjn3XIOA==' > ksk_40598.txt
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'ihJMWRQ3pSrYeubtIuOstSw4hw==' > zsk_19251.txt
 ```
 
 #### Import ZSK and (prepare to) publish in DNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/keys/ext_zsk.txt -P -1h multisigner.examples.nu
+sudo dnssec-importkey -f /var/cache/bind/keys/zsk_19251.txt -P -1h multisigner.examples.nu
 ```
 
 #### Import KSK and (prepare to) publish in CDS and CDNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/keys/ext_ksk.txt -P sync -1h multisigner.examples.nu
+sudo dnssec-importkey -f /var/cache/bind/keys/ksk_40598.txt -P sync -1h multisigner.examples.nu
 ```
 
 #### (Optional) Add the foreign KSK to the DNSKEY set
@@ -189,16 +213,12 @@ sudo rndc loadkeys multisigner.examples.nu
 ```
 
 
-### Repeat Fetch/Import/Load steps for second master
+## Repeat Fetch/Import/Load steps for second master
 
-
-
-#### Reload BIND on both servers
-Note: Introducing the foreign DNSKEY records on one server at a time works fine, but fetching the right DNSKEYs to import requires more effort.
 
 #### Check both servers for DNSKEY, CDS and CDNSKEY records
 
-Note: The imported foreign KSK will appear only if you have opted to publish it (like below).
+Note: The imported foreign KSK (on BIND) will appear only if you have opted to publish it.
 
 ```bash
 dig @ns1.multisigner.examples.nu multisigner.examples.nu axfr | egrep 'IN\s+(CDS|[C]?DNSKEY)'
@@ -240,10 +260,6 @@ multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf
 	ns2     A       13.53.109.125
 ```
 
-```bash
-sudo rndc reload
-```
-
 #### Update NS records at parent through CSYNC (if supported) on both master servers
 
 ```
@@ -259,6 +275,9 @@ sudo rndc reload
 	ns2     A       13.53.109.125
 ```
 
+```bash
+sudo rndc reload
+```
 
 #### Check that the parent nameservers have picked up and published the correct DS records
 
@@ -339,7 +358,6 @@ multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ca4SqKRUR0GWRy/C8lChaFWtYB+zO3nX
 multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
 multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082zRur71xY7oHz5o7HMCZ9tWg5n bjo8WN0YRTAqRlsBr0ZS1pxjn3XIOA==
 ```
-
 
 
 
