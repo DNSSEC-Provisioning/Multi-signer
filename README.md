@@ -21,4 +21,5 @@ https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/events.md
 - Multi-Signer DNSSEC Models: https://tools.ietf.org/html/rfc8901.  
 - Managing DS Records from the Parent via CDS/CDNSKEY: https://tools.ietf.org/html/rfc8078.  
 - Child-to-Parent Synchronization in DNS: https://tools.ietf.org/html/rfc7477.  
+- [Support for CDS/CDNSKEY updates](https://github.com/oskar456/cds-updates/#support-for-cdscdnskey-updates)
 
