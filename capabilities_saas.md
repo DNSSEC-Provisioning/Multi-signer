@@ -16,7 +16,7 @@ Please let us know if you miss any particulare brand of name server, capabilitie
 
 ## Capabilities
 
-All capabilities specify CLI/DDNS/API.
+All capabilities specify DDNS/API/Web.
 
 Capability | deSEC.io
 ---------- | ---- 
