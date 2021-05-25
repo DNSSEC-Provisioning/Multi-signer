@@ -31,12 +31,12 @@ sudo apt-get install knot-dnsutils
 sudo vi /var/lib/knot/multisigner.examples.nu
 ```
 ```
-	$ORIGIN multisigner.examples.nu.
-	$TTL 120
-	@       SOA     ns3.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
+$ORIGIN multisigner.examples.nu.
+$TTL 120
+@       SOA     ns3.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
 
-	@       NS      ns3
-	ns3     A       13.51.108.122
+@       NS      ns3
+ns3     A       13.51.108.122
 ```
 
 
@@ -205,18 +205,18 @@ If there are multiple sets of keys in the key set (if joining a multi signer gro
 
 ```bash
 cd /var/lib/knot/
-dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'rEAEiR5Po3MpGVvvW744fnhIhw==' > ksk_5412.key
-dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'ihJMWRQ3pSrYeubtIuOstSw4hw==' > zsk_34191.key
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'rEAEiR5Po3MpGVvvW744fnhIhw==' > /tmp/ksk_5412.key
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'ihJMWRQ3pSrYeubtIuOstSw4hw==' > /tmp/zsk_34191.key
 ```
 
 #### Import ZSK and (prepare to) publish in DNSKEY set
 ```bash
-sudo keymgr multisigner.examples.nu import-pub zsk_34191.key
+sudo keymgr multisigner.examples.nu import-pub /tmp/zsk_34191.key
 ```
 
 #### Import KSK and (prepare to) publish in DNSKEY set
 ```bash
-sudo keymgr multisigner.examples.nu import-pub ksk_5412.key
+sudo keymgr multisigner.examples.nu import-pub /tmp/ksk_5412.key
 ```
 
 ## IMPORTANT NOTE! - beyond this point, things get a finicky. Reloading KNOT at any point will remove injected CDS and CDNSKEY records
@@ -226,16 +226,16 @@ sudo keymgr multisigner.examples.nu import-pub ksk_5412.key
 This step must be performed out of the suggested order, since it requires a reload.
 
 ```
-	$ORIGIN multisigner.examples.nu.
-	$TTL 120
-	@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
+$ORIGIN multisigner.examples.nu.
+$TTL 120
+@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
 
-	@		IN		CSYNC	0 1 A NS AAAA
+@		IN		CSYNC	0 1 A NS AAAA
 
-	@       NS      ns1
-	@       NS      ns3
-	ns1     A       13.51.70.181
-	ns3     A       13.51.108.122
+@       NS      ns1
+@       NS      ns3
+ns1     A       13.51.70.181
+ns3     A       13.51.108.122
 ```
 
 ```bash
@@ -248,10 +248,10 @@ sudo knotc zone-reload multisigner.examples.nu
 Note: In the current version of Knot (se above), the only way to insert foreign CDS and CDNSKEY records in a zone is through the Knot CLI. Records added directly to the zone file are removed at reload and never shows up in the zone. Attempts to add the records through nsupdate will result in a REFUSED response.
 
 ```bash
-knotc zone-begin multisigner.examples.nu
-knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDNSKEY 257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitKwyH/rEAEiR5Po3MpGVvvW744fnhIhw==
-knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDS 5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF8609FBE346
-knotc zone-commit multisigner.examples.nu
+sudo knotc zone-begin multisigner.examples.nu
+sudo knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDNSKEY 257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitKwyH/rEAEiR5Po3MpGVvvW744fnhIhw==
+sudo knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDS 5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF8609FBE346
+sudo knotc zone-commit multisigner.examples.nu
 ```
 
 #### Check server for DNSKEY, CDS and CDNSKEY records
@@ -319,14 +319,14 @@ Note: Wait 2 x maximum TTL of DS at parent and DNSKEY at all children before pro
 As mentioned, the CDS and CDNSKEY records will be removed at reload. Removing the CSYC record from the zone will suffice.
 
 ```
-	$ORIGIN multisigner.examples.nu.
-	$TTL 120
-	@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
+$ORIGIN multisigner.examples.nu.
+$TTL 120
+@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
 
-	@       NS      ns1
-	@       NS      ns2
-	ns1     A       13.51.70.181
-	ns2     A       13.53.109.125
+@       NS      ns1
+@       NS      ns2
+ns1     A       13.51.70.181
+ns2     A       13.53.109.125
 ```
 
 ```bash
