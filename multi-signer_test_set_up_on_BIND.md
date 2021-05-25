@@ -23,25 +23,26 @@ sudo apt install bind9
 sudo vi /var/cache/bind/multisigner.examples.nu
 ```
 ```
-	$ORIGIN multisigner.examples.nu.
-	$TTL 120
-	@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
+$ORIGIN multisigner.examples.nu.
+$TTL 120
+@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
 
-	@       NS      ns1
-	ns1     A       13.51.70.181
+@       NS      ns1
+ns1     A       13.51.70.181
 ```
 
 #### Add configuration
 ```bash
-sudo vi /etc/bind/named.zones.local
+sudo vi /etc/bind/named.conf.local
 ```
 ```
-	zone "multisigner.examples.nu" {
-	    type master;
-        key-directory "/var/cache//bind/keys";
-        auto-dnssec maintain;
-        inline-signing yes;
-	};
+zone "multisigner.examples.nu" {
+    type master;
+    file "multisigner.examples.nu";
+    key-directory "/var/cache/bind/keys";
+    auto-dnssec maintain;
+    inline-signing yes;
+};
 ```
 
 #### Generate keys
@@ -68,7 +69,7 @@ ls -l /var/cache/bind/keys/K*
 -rw------- 1 bind root 187 Apr 19 10:35 Kmultisigner.examples.nu.+013+34191.private
 ```
 
-To publish CDS and CDNSKEY records:
+To publish CDS and CDNSKEY records (KSK):
 ```bash
 sudo dnssec-settime -P sync -1h Kmultisigner.examples.nu.+013+05412.private
 ```
@@ -168,19 +169,19 @@ If there are multiple sets of keys in the key set (if joining a multi signer gro
 
 
 ```bash
-cd /var/lib/knot/
-dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep '8WN0YRTAqRlsBr0ZS1pxjn3XIOA==' > ksk_40598.txt
-dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'ihJMWRQ3pSrYeubtIuOstSw4hw==' > zsk_19251.txt
+cd /var/cache/bind/keys
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep '8WN0YRTAqRlsBr0ZS1pxjn3XIOA==' > /tmp/ksk_40598.txt
+dig @ns1.multisigner.examples.nu multisigner.examples.nu DNSKEY | egrep 'ihJMWRQ3pSrYeubtIuOstSw4hw==' > /tmp/zsk_19251.txt
 ```
 
 #### Import ZSK and (prepare to) publish in DNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/keys/zsk_19251.txt -P -1h multisigner.examples.nu
+sudo dnssec-importkey -f /tmp/zsk_19251.txt -P -1h multisigner.examples.nu
 ```
 
 #### Import KSK and (prepare to) publish in CDS and CDNSKEY set
 ```bash
-sudo dnssec-importkey -f /var/cache/bind/keys/ksk_40598.txt -P sync -1h multisigner.examples.nu
+sudo dnssec-importkey -f /tmp/ksk_40598.txt -P sync -1h multisigner.examples.nu
 ```
 
 #### (Optional) Add the foreign KSK to the DNSKEY set
