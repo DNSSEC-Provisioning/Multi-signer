@@ -18,11 +18,13 @@ Please let us know if you miss any particulare brand of name server, capabilitie
 
 All capabilities specify DDNS/API/Web.
 
-Capability | deSEC.io
----------- | ---- 
-Add DNSKEY records (without access to private key) | No/Yes/Yes 
-Remove (previously added) DNSKEY record(s) | | |
-Add CDS/CDNSKEY record for keys not in the DNSKEY set | No/Yes/Yes
-Remove CDS/CDNSKEY records | | |
-Add CSYNC record | No/Yes/Yes
-Remove CSYNC record | | |
+Capability | deSEC.io | NS1 | Neustar
+---------- | -------- | --- | -------
+Add DNSKEY records (without access to private key) | No/Yes/Yes | <sup>1</sup> | <sup>1</sup>
+Remove (previously added) DNSKEY record(s) | | <sup>1</sup> | <sup>1</sup>
+Add CDS/CDNSKEY record for keys not in the DNSKEY set | No/Yes/Yes | <sup>1</sup> | <sup>1</sup>
+Remove CDS/CDNSKEY records | | <sup>1</sup> | <sup>1</sup>
+Add CSYNC record | No/Yes/Yes | <sup>1</sup> | <sup>1</sup>
+Remove CSYNC record | | <sup>1</sup> | <sup>1</sup>
+
+<sup>1</sup> Work In Progress
