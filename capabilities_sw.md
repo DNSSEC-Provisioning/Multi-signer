@@ -18,9 +18,9 @@ All capabilities specify CLI/DDNS/API.
 Capability | Bind | Knot | PowerDNS | NSD
 ---------- | ---- | ---- | -------- | ---
 Add DNSKEY records (without access to private key) | Yes/No/No | Yes/No/No | Yes<sup>1</sup>/Yes/Yes | n/a<sup>2</sup>
-Remove (previously added) DNSKEY record(s) | | | Yes/Yes/Yes | n/a<sup>3</sup>
+Remove (previously added) DNSKEY record(s) | | | Yes/Yes/Yes | n/a<sup>2</sup>
 Add CDS/CDNSKEY record for keys not in the DNSKEY set | No/No/No| No/No/No | Yes<sup>1</sup>/Yes/Yes | n/a<sup>2</sup>
-Remove (previously added) CDS/CDNSKEY records | | | Yes/Yes/Yes | n/a<sup>3</sup>
+Remove (previously added) CDS/CDNSKEY records | | | Yes/Yes/Yes | n/a<sup>2</sup>
 Add CSYNC record | ?/?/No | ?/?/No | Yes<sup>1</sup>/Yes/Yes | n/a<sup>2</sup>
 Remove CSYNC record | | | Yes/Yes/Yes | n/a<sup>2</sup>
 
