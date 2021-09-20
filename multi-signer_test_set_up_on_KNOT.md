@@ -1,7 +1,7 @@
 # Testing Multi-signer set up using Knot DNS.
 
 * Ubuntu 20.04
-* Knot DNS, version 2.9.9
+* Knot DNS, version 3.1.2
 
 #### Notes
 * Third level domain (multisigner.examples.nu) used for easy management of DS records
@@ -14,7 +14,7 @@
 
 #### Install Knot
 ```bash
-sudo add-apt-repository ppa:cz.nic-labs/knot-dns
+sudo add-apt-repository ppa:cz.nic-labs/knot-dns-latest
 ```
 ```bash
 sudo apt-get update
@@ -106,7 +106,7 @@ Notes on zone statement:
 * Parameters set with testing in mind
 * No journal file (journal-content: none)
 * Full zone file always loadded from disc (zonefile-load: whole)
-* All changes made to zone through nsupdate/knot cli written to zone without delay 
+* All changes made to zone through knot cli written to zone without delay 
 
 #### Check Knot configuration and zone file
 
@@ -138,27 +138,27 @@ Note: Restart of service required, since Knot need to rebind the listening IP/po
 ``` bash
 ;; ANSWER SECTION:
 multisigner.examples.nu. 120 IN	DNSKEY 256 3 13 (
-				ofWpeKxBcxvJBvSOa4JSssYgDwBeTHQAsAv5ft8OZzNs
-				3WkfA2NlTjqgHx6R28STZVa0Kv3X8/DbtMxCgivgyQ==
-				) ; ZSK; alg = ECDSAP256SHA256 ; key id = 34544
+				q2fN0krBXnxYBOp54830DqcmHK2+yLCfz2Qsd/EbMJh2
+				wSnP4OKpzhqcHIrcQxpqMkBLXdMh9B4+5XiuhsZjAg==
+				) ; ZSK; alg = ECDSAP256SHA256 ; key id = 53501
 multisigner.examples.nu. 120 IN	DNSKEY 257 3 13 (
-				DZK8TEg5axTfB2wI5V8OsqJKzmKT9aA5L4S54TErZ7PS
-				6Gg2pJmv6E2lUnc9HuyolDmQsKYbWhLv2mqO/ZLj3Q==
-				) ; KSK; alg = ECDSAP256SHA256 ; key id = 41461
+				ZH9ze60H9nPvK5ftDKj16+4NcBhfGdvocZiiiamMt0Qu
+				pZX4x6tazEXXuortj63Da0RQotWa31LCn8P3cGZglw==
+				) ; KSK; alg = ECDSAP256SHA256 ; key id = 25219
 ```
 ```bash
  dig @localhost multisigner.examples.nu CDS
 ```
 ```bash
 ;; ANSWER SECTION:
-multisigner.examples.nu. 0	IN	CDS	41461 13 2 338571BB87C733A237CE40609104F0423F9F15CDE88B57BC897D80E1 1CF58FD3
+multisigner.examples.nu. 0	IN	CDS	25219 13 2 ED909461B183C478332EDB0D22FFA535FCF6A0995A9EE88D4C117CAC 90A96BC7
 ```
 ```bash
  dig @localhost multisigner.examples.nu CDNSKEY
 ```
 ```bash
 ;; ANSWER SECTION:
-multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 DZK8TEg5axTfB2wI5V8OsqJKzmKT9aA5L4S54TErZ7PS6Gg2pJmv6E2l Unc9HuyolDmQsKYbWhLv2mqO/ZLj3Q==
+multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 ZH9ze60H9nPvK5ftDKj16+4NcBhfGdvocZiiiamMt0QupZX4x6tazEXX uortj63Da0RQotWa31LCn8P3cGZglw==
 ```
 
 
@@ -179,8 +179,9 @@ Note: Adjust names for NS records accordingly
 
 #### Notes
 * Both master servers need to have identical CDS and CDNSKEY records
-* While only the foreign ZSK needs to be published in the DNSKEY record set, importing the foreign KSK as well is reccomended.
+* While only the foreign ZSK needs to be published in the DNSKEY record set, importing the foreign KSK as well is recommended.
 * Chain of trust will be intact, even if you don't att the foreign KSK to the DNSKEY set, but zone checking tools may give a warning or error.
+* Same DNSKEY algorithms expected unless `unsafe-operation: no-check-keyset` is configured in the policy.
 
 #### Get DNSKEYs from other master
 
@@ -218,17 +219,55 @@ sudo keymgr multisigner.examples.nu import-pub /tmp/zsk_34191.key
 ```bash
 sudo keymgr multisigner.examples.nu import-pub /tmp/ksk_5412.key
 ```
+```
+314a370c7643ad4423ec5bf66b18a143ae605f83
+OK
+```
 
-## IMPORTANT NOTE! - beyond this point, things get a finicky. Reloading KNOT at any point will remove injected CDS and CDNSKEY records
+#### Adjust foreign KSK to not published but with corresponding CDS and CDNSKEY records published
+```bash
+sudo keymgr multisigner.examples.nu 314a370c7643ad4423ec5bf66b18a143ae605f83 publish=0 ready=+0
+```
+
+#### Check the key set
+```bash
+sudo keymgr multisigner.examples.nu -b list
+```
+```
+937ef367443f3014dd001eba35fd48646069422a 25219 KSK ECDSAP256SHA256 publish=1632150545 ready=1632150545
+94a6a0eb68a7043a58957b34bfe3bf220cd39799 53501 ZSK ECDSAP256SHA256 publish=1632150545 active=1632150545
+2b53986bd472eb17a6e3f1f4f9fe3125b52ae463 34191 ZSK ECDSAP256SHA256 public-only publish=1632150984
+314a370c7643ad4423ec5bf66b18a143ae605f83  5412 KSK ECDSAP256SHA256 public-only ready=1632151241
+```
+
+#### Reload the key set and update RRSIGs
+```bash
+sudo knotc zone-keys-load multisigner.examples.nu.
+```
+
+#### Check server for DNSKEY, CDS and CDNSKEY records
+
+
+```bash
+dig @localhost multisigner.examples.nu axfr | egrep 'IN\s+(CDS|[C]?DNSKEY)'
+```
+
+```
+multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ca4SqKRUR0GWRy/C8lChaFWtYB+zO3nX+byozlS1fxDsqVHRSYImDzR6 ZkgOihJMWRQ3pSrYeubtIuOstSw4hw==
+multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 q2fN0krBXnxYBOp54830DqcmHK2+yLCfz2Qsd/EbMJh2wSnP4OKpzhqc HIrcQxpqMkBLXdMh9B4+5XiuhsZjAg==
+multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 ZH9ze60H9nPvK5ftDKj16+4NcBhfGdvocZiiiamMt0QupZX4x6tazEXX uortj63Da0RQotWa31LCn8P3cGZglw==
+multisigner.examples.nu. 0	IN	CDS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF86 09FBE346
+multisigner.examples.nu. 0	IN	CDS	25219 13 2 ED909461B183C478332EDB0D22FFA535FCF6A0995A9EE88D4C117CAC 90A96BC7
+multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
+multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 ZH9ze60H9nPvK5ftDKj16+4NcBhfGdvocZiiiamMt0QupZX4x6tazEXX uortj63Da0RQotWa31LCn8P3cGZglw==
+```
 
 #### Update NS record set and add CSYNC record (if supported by parent)
-
-This step must be performed out of the suggested order, since it requires a reload.
 
 ```
 $ORIGIN multisigner.examples.nu.
 $TTL 120
-@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586094 14400 3600 1814400 120
+@       SOA     ns1.multisigner.examples.nu. dns.examples.nu. 1618586097 14400 3600 1814400 120
 
 @		IN		CSYNC	0 1 A NS AAAA
 
@@ -240,37 +279,6 @@ ns3     A       13.51.108.122
 
 ```bash
 sudo knotc zone-reload multisigner.examples.nu
-```
-
-
-#### Add the CDNSKEY and CDS to the zone
-
-Note: In the current version of Knot (se above), the only way to insert foreign CDS and CDNSKEY records in a zone is through the Knot CLI. Records added directly to the zone file are removed at reload and never shows up in the zone. Attempts to add the records through nsupdate will result in a REFUSED response.
-
-```bash
-sudo knotc zone-begin multisigner.examples.nu
-sudo knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDNSKEY 257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitKwyH/rEAEiR5Po3MpGVvvW744fnhIhw==
-sudo knotc zone-set multisigner.examples.nu multisigner.examples.nu. CDS 5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF8609FBE346
-sudo knotc zone-commit multisigner.examples.nu
-```
-
-#### Check server for DNSKEY, CDS and CDNSKEY records
-
-
-```bash
-dig @localhost multisigner.examples.nu axfr | egrep 'IN\s+(CDS|[C]?DNSKEY)'
-```
-
-```
-multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 DZK8TEg5axTfB2wI5V8OsqJKzmKT9aA5L4S54TErZ7PS6Gg2pJmv6E2l Unc9HuyolDmQsKYbWhLv2mqO/ZLj3Q==
-multisigner.examples.nu. 0	IN	CDNSKEY	257 3 13 NvvCwBO9w8aCW2N884uA1VhJlSkSMvXf4jsfDiIgV2gu25LqIL2KyitK wyH/rEAEiR5Po3MpGVvvW744fnhIhw==
-multisigner.examples.nu. 0	IN	CDS	5412 13 2 9DA5358E29E521BC72AA75CC54C7C863C5DA8BE2F1018566717EAF86 09FBE346
-multisigner.examples.nu. 0	IN	CDS	41461 13 2 338571BB87C733A237CE40609104F0423F9F15CDE88B57BC897D80E1 1CF58FD3
-multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ca4SqKRUR0GWRy/C8lChaFWtYB+zO3nX+byozlS1fxDsqVHRSYImDzR6 ZkgOihJMWRQ3pSrYeubtIuOstSw4hw==
-multisigner.examples.nu. 120	IN	DNSKEY	256 3 13 ofWpeKxBcxvJBvSOa4JSssYgDwBeTHQAsAv5ft8OZzNs3WkfA2NlTjqg Hx6R28STZVa0Kv3X8/DbtMxCgivgyQ==
-multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 DZK8TEg5axTfB2wI5V8OsqJKzmKT9aA5L4S54TErZ7PS6Gg2pJmv6E2l Unc9HuyolDmQsKYbWhLv2mqO/ZLj3Q==
-multisigner.examples.nu. 120	IN	DNSKEY	257 3 13 jNDEQ5zVp6tYqqtC6hujGPzyVbnQ082zRur71xY7oHz5o7HMCZ9tWg5n bjo8WN0YRTAqRlsBr0ZS1pxjn3XIOA==
-root@ip-172-31-29-72:/var/lib/knot#
 ```
 
 
@@ -314,9 +322,7 @@ multisigner.examples.nu. 120	IN	NS	ns1.multisigner.examples.nu.
 
 Note: Wait 2 x maximum TTL of DS at parent and DNSKEY at all children before proceding with this step.
 
-#### Remove the CSYNC and CDS/CDNSKEY records
-
-As mentioned, the CDS and CDNSKEY records will be removed at reload. Removing the CSYC record from the zone will suffice.
+#### Remove the CSYNC record
 
 ```
 $ORIGIN multisigner.examples.nu.
