@@ -7,6 +7,7 @@ Past events are kept as a reference.
 # Future Events
 Event | Date | Status
 ----- | ---- | ------
+ICANN 73 | 5-10 March 2022 | 
 
 # Past Events
 Event | Date | Comment
