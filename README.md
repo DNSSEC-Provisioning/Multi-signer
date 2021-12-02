@@ -19,7 +19,7 @@ Specifications|[RFC 8901 - Multi-Signer DNSSEC Models](https://www.rfc-editor.or
 Multi-Signer Controller | (https://github.com/DNSSEC-Provisioning/music) | In Progress
 Name Server Capabilities | see [Capabilities of Name Server Software](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/capabilities_sw.md)
 Service Provider Capabilities | see [Capabilities of DNS Service Providers](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/capabilities_saas.md)
-Observations Platform | see XXX | Done
+Observations Platform | see (https://dnssecviews.net) | Done
 Test Definitions | see [Test Definitions](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/testdefinitions.md) | In Progress
 Demonstrations | | TBD
 
