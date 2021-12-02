@@ -20,7 +20,7 @@ Multi-Signer Controller | (https://github.com/DNSSEC-Provisioning/music) | In Pr
 Name Server Capabilities | see [Capabilities of Name Server Software](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/capabilities_sw.md)
 Service Provider Capabilities | see [Capabilities of DNS Service Providers](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/capabilities_saas.md)
 Observations Platform | see XXX | Done
-Test Definitions | | In Progress
+Test Definitions | see [Test Definitions](https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/testdefinitions.md) | In Progress
 Demonstrations | | TBD
 
 ## Please meet us at these events
