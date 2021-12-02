@@ -23,8 +23,6 @@ Observations Platform | see XXX | Done
 Test Definitions | | In Progress
 Demonstrations | | TBD
 
-## Documents of interest
-
 ## Please meet us at these events
 https://github.com/DNSSEC-Provisioning/Multi-signer/blob/main/events.md
 
